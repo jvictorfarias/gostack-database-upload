@@ -68,6 +68,6 @@ export default class CreateTransactions1587046984438
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropForeignKey('transactions', 'TransactionCategory');
-    await queryRunner.dropTable('categories');
+    await queryRunner.dropTable('transactions');
   }
 }
