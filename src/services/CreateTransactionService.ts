@@ -13,6 +13,7 @@ interface Request {
 }
 
 interface Response {
+  id: string;
   title: string;
   value: number;
   type: 'income' | 'outcome';
@@ -28,6 +29,12 @@ class CreateTransactionService {
   }: Request): Promise<Response> {
     const categoryRepository = getRepository(Category);
     const transactionRepository = getCustomRepository(TransactionsRepository);
+
+    const { total } = await transactionRepository.getBalance();
+
+    if (type === 'outcome' && value > total) {
+      throw new AppError('Not enough cash');
+    }
 
     if (
       !(await categoryRepository.findOne({
@@ -51,11 +58,13 @@ class CreateTransactionService {
       value,
       type,
       category_id: transactionCategory.id,
+      category: transactionCategory,
     });
 
-    await transactionRepository.save(transaction);
+    const { id } = await transactionRepository.save(transaction);
 
     return {
+      id,
       title,
       value,
       type,
