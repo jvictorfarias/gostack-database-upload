@@ -56,7 +56,6 @@ class CreateTransactionService {
     if (transactionCategory === undefined) {
       throw new AppError('Database error.');
     }
-
     const transaction = transactionRepository.create({
       title,
       value,

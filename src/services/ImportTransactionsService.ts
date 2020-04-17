@@ -1,3 +1,4 @@
+import { getCustomRepository } from 'typeorm';
 import path from 'path';
 import fs from 'fs';
 import csv from 'csvtojson';
@@ -11,15 +12,13 @@ import CreateTransactionService from './CreateTransactionService';
 
 interface Request {
   filename: string;
-  createTransaction: CreateTransactionService;
 }
 
 class ImportTransactionsService {
-  async execute({
-    filename,
-    createTransaction,
-  }: Request): Promise<Transaction[]> {
+  async execute({ filename }: Request): Promise<Transaction[]> {
+    const createTransaction = new CreateTransactionService();
     const csvPath = path.join(uploadConfig.directory, filename);
+
     if (!(await fs.promises.stat(csvPath))) {
       throw new AppError('File not found');
     }
@@ -42,15 +41,10 @@ class ImportTransactionsService {
       checkType: true,
     }).fromFile(csvPath);
 
-    parsedTransactions.map(async transaction => {
-      const { title, type, value, category } = transaction;
-      await createTransaction.execute({
-        title,
-        type,
-        value,
-        category,
-      });
-    });
+    for (let index = 0; index < parsedTransactions.length; index++) {
+      const { title, type, value, category } = parsedTransactions[index];
+      await createTransaction.execute({ title, type, value, category });
+    }
 
     await fs.promises.unlink(csvPath);
 

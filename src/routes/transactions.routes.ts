@@ -50,13 +50,11 @@ transactionsRouter.post(
   async (request, response) => {
     const { filename } = request.file;
 
-    const createTransaction = new CreateTransactionService();
     const importTransaction = new ImportTransactionsService();
 
     // Trying to maintain the dependecy inversion pattern
     const transactions = await importTransaction.execute({
       filename,
-      createTransaction,
     });
 
     return response.status(200).json(transactions);
