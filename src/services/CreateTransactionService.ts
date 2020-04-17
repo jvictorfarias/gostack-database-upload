@@ -30,6 +30,8 @@ class CreateTransactionService {
     const categoryRepository = getRepository(Category);
     const transactionRepository = getCustomRepository(TransactionsRepository);
 
+    const categoryCapitalized =
+      category.charAt(0).toUpperCase() + category.slice(1).toLowerCase();
     const { total } = await transactionRepository.getBalance();
 
     if (type === 'outcome' && value > total) {
@@ -38,15 +40,17 @@ class CreateTransactionService {
 
     if (
       !(await categoryRepository.findOne({
-        where: { title: category },
+        where: { title: categoryCapitalized },
       }))
     ) {
-      const newCategory = categoryRepository.create({ title: category });
+      const newCategory = categoryRepository.create({
+        title: categoryCapitalized,
+      });
       await categoryRepository.save(newCategory);
     }
 
     const transactionCategory = await categoryRepository.findOne({
-      where: { title: category },
+      where: { title: categoryCapitalized },
     });
 
     if (transactionCategory === undefined) {
