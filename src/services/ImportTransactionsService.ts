@@ -29,7 +29,6 @@ class ImportTransactionsService {
 
   async execute({ filename }: Request): Promise<Transaction[]> {
     const csvPath = path.join(uploadConfig.directory, filename);
-
     if (!(await fs.promises.stat(csvPath))) {
       throw new AppError('File not found');
     }
@@ -38,14 +37,14 @@ class ImportTransactionsService {
       checkType: true,
     }).fromFile(csvPath);
 
-    const transactions: Transaction[] = parsedTransactions.reduce(
-      async (accumulator, transaction: CSV) => {
+    const transactions = parsedTransactions.reduce(
+      async (accumulator, transaction: Transaction) => {
         await accumulator;
         return this.createTransaction.execute({
           title: transaction.title,
           type: transaction.type,
           value: transaction.value,
-          category: transaction.category,
+          category: transaction.category.toString(),
         });
       },
       Promise.resolve(),
