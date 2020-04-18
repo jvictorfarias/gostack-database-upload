@@ -1,4 +1,6 @@
-import { getCustomRepository } from 'typeorm';
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
+
 import path from 'path';
 import fs from 'fs';
 import csv from 'csvtojson';
@@ -23,27 +25,18 @@ class ImportTransactionsService {
       throw new AppError('File not found');
     }
 
-    // fs.createReadStream(csvPath)
-    //   .pipe(
-    //     csv({
-    //       headers: ['title', 'type', 'value', 'category'],
-    //       mapHeaders: ({ header }) => header.toLowerCase(),
-    //       mapValues: ({ header, value }) =>
-    //         header === 'category' ? value.toLowerCase().trim() : value.trim(),
-    //     }),
-    //   )
-    //   .on('data', data => transactions.push(data));
-    //
-    // console.log(transactions);
-    //
-
     const parsedTransactions = await csv({
       checkType: true,
     }).fromFile(csvPath);
 
-    for (let index = 0; index < parsedTransactions.length; index++) {
-      const { title, type, value, category } = parsedTransactions[index];
-      await createTransaction.execute({ title, type, value, category });
+    for (const transaction of parsedTransactions) {
+      const { title, type, value, category } = transaction;
+      await createTransaction.execute({
+        title,
+        type,
+        value,
+        category,
+      });
     }
 
     await fs.promises.unlink(csvPath);
