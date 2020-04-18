@@ -1,6 +1,3 @@
-/* eslint-disable no-await-in-loop */
-/* eslint-disable no-restricted-syntax */
-
 import path from 'path';
 import fs from 'fs';
 import csv from 'csvtojson';
@@ -16,6 +13,13 @@ interface Request {
   filename: string;
 }
 
+interface CSV {
+  title: string;
+  type: 'income' | 'outcome';
+  value: number;
+  category: string;
+}
+
 class ImportTransactionsService {
   async execute({ filename }: Request): Promise<Transaction[]> {
     const createTransaction = new CreateTransactionService();
@@ -29,19 +33,32 @@ class ImportTransactionsService {
       checkType: true,
     }).fromFile(csvPath);
 
-    for (const transaction of parsedTransactions) {
-      const { title, type, value, category } = transaction;
-      await createTransaction.execute({
-        title,
-        type,
-        value,
-        category,
-      });
-    }
+    // for (const transaction of parsedTransactions) {
+    //   const { title, type, value, category } = transaction;
+    //   await createTransaction.execute({
+    //     title,
+    //     type,
+    //     value,
+    //     category,
+    //   });
+    // }
+
+    const transactions = parsedTransactions.reduce(
+      async (accumulator, transaction: CSV) => {
+        await accumulator;
+        return createTransaction.execute({
+          title: transaction.title,
+          type: transaction.type,
+          value: transaction.value,
+          category: transaction.category,
+        });
+      },
+      Promise.resolve(),
+    );
 
     await fs.promises.unlink(csvPath);
 
-    return parsedTransactions;
+    return transactions;
   }
 }
 

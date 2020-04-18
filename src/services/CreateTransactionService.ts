@@ -34,6 +34,9 @@ class CreateTransactionService {
       category.charAt(0).toUpperCase() + category.slice(1).toLowerCase();
     const { total } = await transactionRepository.getBalance();
 
+    if (!['income', 'outcome'].includes(type)) {
+      throw new AppError('Invalid type');
+    }
     if (type === 'outcome' && value > total) {
       throw new AppError('Not enough cash');
     }
