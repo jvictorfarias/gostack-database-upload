@@ -21,8 +21,13 @@ interface CSV {
 }
 
 class ImportTransactionsService {
+  private createTransaction: CreateTransactionService;
+
+  constructor() {
+    this.createTransaction = new CreateTransactionService();
+  }
+
   async execute({ filename }: Request): Promise<Transaction[]> {
-    const createTransaction = new CreateTransactionService();
     const csvPath = path.join(uploadConfig.directory, filename);
 
     if (!(await fs.promises.stat(csvPath))) {
@@ -36,7 +41,7 @@ class ImportTransactionsService {
     const transactions: Transaction[] = parsedTransactions.reduce(
       async (accumulator, transaction: CSV) => {
         await accumulator;
-        return createTransaction.execute({
+        return this.createTransaction.execute({
           title: transaction.title,
           type: transaction.type,
           value: transaction.value,
