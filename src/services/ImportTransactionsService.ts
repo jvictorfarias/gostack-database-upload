@@ -33,17 +33,7 @@ class ImportTransactionsService {
       checkType: true,
     }).fromFile(csvPath);
 
-    // for (const transaction of parsedTransactions) {
-    //   const { title, type, value, category } = transaction;
-    //   await createTransaction.execute({
-    //     title,
-    //     type,
-    //     value,
-    //     category,
-    //   });
-    // }
-
-    const transactions = parsedTransactions.reduce(
+    const transactions: Transaction[] = parsedTransactions.reduce(
       async (accumulator, transaction: CSV) => {
         await accumulator;
         return createTransaction.execute({
