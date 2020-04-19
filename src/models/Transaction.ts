@@ -25,17 +25,19 @@ class Transaction {
   value: number;
 
   @Column()
-  category_id?: string;
+  category_id: string;
 
-  @ManyToOne(() => Category, category => category.title)
+  @ManyToOne(() => Category, category => category.transactions, {
+    eager: true,
+  })
   @JoinColumn({ name: 'category_id' })
-  category: Category | string;
+  category: Category;
 
   @CreateDateColumn()
-  created_at?: Date;
+  created_at: Date;
 
   @UpdateDateColumn()
-  updated_at?: Date;
+  updated_at: Date;
 }
 
 export default Transaction;

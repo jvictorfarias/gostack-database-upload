@@ -68,15 +68,9 @@ class CreateTransactionService {
       category: transactionCategory,
     });
 
-    const { id } = await transactionRepository.save(transaction);
+    await transactionRepository.save(transaction);
 
-    return {
-      id,
-      title,
-      value,
-      type,
-      category,
-    };
+    return transaction;
   }
 }
 

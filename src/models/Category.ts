@@ -16,7 +16,7 @@ class Category {
   @Column()
   title: string;
 
-  @OneToMany(() => Transaction, transaction => transaction.category_id)
+  @OneToMany(() => Transaction, transaction => transaction.category)
   transactions: Transaction[];
 
   @CreateDateColumn()

@@ -24,14 +24,22 @@ transactionsRouter.post('/', async (request, response) => {
 
   const createTransaction = new CreateTransactionService();
 
-  const transaction = await createTransaction.execute({
+  const { id, category: createdCategory } = await createTransaction.execute({
     title,
     value,
     type,
     category,
   });
 
-  return response.status(200).json(transaction);
+  const categoryName = createdCategory.title;
+
+  return response.status(200).json({
+    id,
+    title,
+    value,
+    type,
+    category: categoryName,
+  });
 });
 
 transactionsRouter.delete('/:id', async (request, response) => {
@@ -52,7 +60,6 @@ transactionsRouter.post(
 
     const importTransaction = new ImportTransactionsService();
 
-    // Trying to maintain the dependecy inversion pattern
     const transactions = await importTransaction.execute({
       filename,
     });

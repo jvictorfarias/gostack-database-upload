@@ -13,13 +13,6 @@ interface Request {
   filename: string;
 }
 
-interface CSV {
-  title: string;
-  type: 'income' | 'outcome';
-  value: number;
-  category: string;
-}
-
 class ImportTransactionsService {
   private createTransaction: CreateTransactionService;
 
@@ -37,9 +30,9 @@ class ImportTransactionsService {
       checkType: true,
     }).fromFile(csvPath);
 
-    const transactions = parsedTransactions.reduce(
-      async (accumulator, transaction: Transaction) => {
-        await accumulator;
+    const transactions: Transaction[] = parsedTransactions.reduce(
+      async (accumulator: Promise<Transaction>[], transaction: Transaction) => {
+        await Promise.all([accumulator]);
         return this.createTransaction.execute({
           title: transaction.title,
           type: transaction.type,
@@ -47,7 +40,7 @@ class ImportTransactionsService {
           category: transaction.category.toString(),
         });
       },
-      Promise.resolve(),
+      [Promise.resolve()],
     );
 
     await fs.promises.unlink(csvPath);
