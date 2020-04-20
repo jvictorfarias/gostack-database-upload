@@ -64,7 +64,6 @@ class CreateTransactionService {
       title,
       value,
       type,
-      category_id: transactionCategory.id,
       category: transactionCategory,
     });
 
